@@ -13,6 +13,7 @@ const Options = () => {
             <input type="text"onChange={(e) => setUserId(e.target.value)}/>
             <p>{socketId}</p>
             <button onClick={() => {callUser(userId);console.log(userId)}}>call</button>
+            <button onClick={() => {leaveCall(userId);console.log(userId)}}>leave call</button>
         </div>
     </div>
   )

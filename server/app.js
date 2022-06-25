@@ -18,17 +18,29 @@ io.on('connection',(socket) => {
 
     socket.emit('getId',socket.id)
 
+
+    socket.on('joinSelf',(id) => {
+        console.log('joined room')
+        socket.join(id)
+    })
+
     //handle call user 
 
-    socket.on('calluser',(userToCall,signalData,from,name) => {
+    socket.on('calluser',({userToCall,from}) => {
         //send proper information to call recipient 
-        io.to(userToCall).emit('calluser',{signal:signalData,from,name})
+        console.log(userToCall)
+        socket.join(userToCall)
+        socket.to(userToCall).emit('calluser',{from})
     })
 
     //handle answer call
     socket.on('answercall',(data) => {
         //notify caller of acceptance
-        io.to(data.to).emit('callaccepted',data.signal)
+        io.to(data.to).emit('callaccepted',data)
+    })
+
+    socket.on('leavecall',({to,user}) => {
+        socket.to(to).emit('leavecall',user)
     })
 })
 
