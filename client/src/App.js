@@ -1,14 +1,13 @@
 import React from 'react'
-import Header from './components/Header'
-import Videos from './components/Videos'
-import Options from './components/Options'
+
+import VideoChat from './VideoChat'
+import LandingPage from './LandingPage'
 
 const App = () => {
   return (
     <div className="app-container">
-      <Header/>
-      <Videos/>
-      <Options/>
+      <LandingPage/>
+      {/* <VideoChat/> */}
     </div>
   )
 }
