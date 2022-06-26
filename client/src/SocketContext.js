@@ -15,6 +15,8 @@ const ContextProvider = ({children}) => {
     const [callAccepted,setCallAccepted] = useState(false)
     const [callEnded,setCallEnded] = useState(false)
     const [allUsers,setAllUsers] = useState([])
+    const [username,setUsername] = useState("")
+    const [recipientName,setRecipientName] = useState("")
 
     const myVideo = useRef()
     const userVideo = useRef()
@@ -92,6 +94,7 @@ const ContextProvider = ({children}) => {
 			    // Show stream in some <video> element.
                 // userVideo.current.srcObject = remoteStream
                 console.log("recieving")
+                myVideo.current.srcObject = stream
                 userVideo.current.srcObject = remoteStream
 		});
         })
@@ -101,6 +104,7 @@ const ContextProvider = ({children}) => {
         
         const call = moPeer.call(id, stream);
         console.log("calling: "+id)
+        console.log(call)
 
         
 		call.on("stream", (remoteStream) => {
@@ -108,6 +112,7 @@ const ContextProvider = ({children}) => {
             // userVideo.current.srcObject = remoteStream
             if(userVideo.current)
             {
+                myVideo.current.srcObject = stream
                 userVideo.current.srcObject = remoteStream
             }
             console.log("recieved remote user")
@@ -127,13 +132,13 @@ const ContextProvider = ({children}) => {
         {
             moPeer.destroy()
         }
-        // window.location.reload()
+        window.location.reload()
     }
 
 
 
     return(
-        <SocketContext.Provider value={{callAccepted,myVideo,userVideo,callEnded,socketId,callUser,answerCall,leaveCall,stream,allUsers}}>
+        <SocketContext.Provider value={{callAccepted,myVideo,userVideo,callEnded,socketId,callUser,answerCall,leaveCall,stream,allUsers,setUsername,username,recipientName}}>
             {children}
         </SocketContext.Provider>
         )

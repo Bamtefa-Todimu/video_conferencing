@@ -13,13 +13,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 5rem;
+    padding: 1rem 5rem;
 }
 
 .video-container
 {
     width: 50%;
-    height: 500px;
+    height: auto;
     position: relative;
     background-color: black;
 }
@@ -29,4 +29,19 @@
     width: 100%;
     height: 100%;
 
+}
+
+.username-display
+{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 30px;
+    display: grid;
+    place-content: center;
+    background-color: black;
+    color: white;
+    border: 1px solid #0DC9BB;
+    backdrop-filter: opacity(20%);
 }
