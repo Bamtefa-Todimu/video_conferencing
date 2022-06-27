@@ -13,7 +13,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.5rem 5rem;
+    padding: 0 5rem;
     background-color: #1d1b1d;
 }
 
@@ -26,6 +26,7 @@
 .ol-icon
 {
     margin-right: 4rem;
+    cursor: pointer;
 }
 
 .leave-call
@@ -35,4 +36,16 @@
     font-size: 1.05rem;
     border: none;
     cursor: pointer;
+}
+
+@media screen and (max-width:681px) {
+    .leave-call
+    {
+        font-size: 0.85rem;
+    }
+
+    .options-wrapper
+    {
+        padding: 0 2rem;
+    }
 }

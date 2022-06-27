@@ -26,21 +26,32 @@ io.on('connection',(socket) => {
 
     //handle call user 
 
-    socket.on('calluser',({userToCall,from}) => {
+    socket.on('calluser',({userToCall,from,callerName}) => {
         //send proper information to call recipient 
         console.log(userToCall)
         socket.join(userToCall)
-        socket.to(userToCall).emit('calluser',{from})
+        socket.to(userToCall).emit('calluser',{from,caller:callerName})
     })
 
     //handle answer call
     socket.on('answercall',(data) => {
         //notify caller of acceptance
         io.to(data.to).emit('callaccepted',data)
+        console.log(data)
     })
 
     socket.on('leavecall',({to,user}) => {
         socket.to(to).emit('leavecall',user)
+    })
+
+    socket.on('muteAudio',(id) => {
+        socket.to(id).emit('muteAudio',{id})
+        console.log('muting audio')
+    })
+
+    socket.on('hideVideo',(id) => {
+        socket.to(id).emit('hideVideo',{id})
+        console.log('hiding Video')
     })
 })
 

@@ -10,6 +10,8 @@ const ContextProvider = ({children}) => {
 
     const[moPeer,setMoPeer] = useState(null) 
     const [socketId,setSocketId] = useState(null)
+    const [recId,setRecId] = useState(null)
+    const [callerId,setCallerId] = useState("")
     const [stream,setStream] = useState(null)
     const [calls,setCall] = useState({})
     const [callAccepted,setCallAccepted] = useState(false)
@@ -17,6 +19,13 @@ const ContextProvider = ({children}) => {
     const [allUsers,setAllUsers] = useState([])
     const [username,setUsername] = useState("")
     const [recipientName,setRecipientName] = useState("")
+
+    const [muted,setMuted] = useState(false)
+    const [remoteMuted,setRemoteMuted] = useState(false)
+
+    const [videoHidden,setVideoHidden] = useState(false)
+    const [remoteVideoHidden,setRemoteVideoHidden] = useState(false)
+
 
     const myVideo = useRef()
     const userVideo = useRef()
@@ -42,13 +51,15 @@ const ContextProvider = ({children}) => {
 
         socket.on('callaccepted',(data) => {
             console.log(data.from + " accepted the call")
+            setRecipientName(data.recipientName)
+            console.log(data.recipientName)
             setCallAccepted(true)
         })
 
 
         socket.on('leavecall',(leaver) => {
             console.log(`${leaver} left`)
-            leaveCall()
+            leaveRes()
         })
 
 
@@ -67,16 +78,50 @@ const ContextProvider = ({children}) => {
     },[])
 
     useEffect(() => {
-        if(moPeer && socketId && userVideo)
+        if(moPeer && socketId && userVideo && username)
         {
 
-            socket.on('calluser',({from}) => {
+            socket.on('calluser',({from,caller}) => {
                 setCall({isRecievedCall:true,from})
-                console.log(from)
+                setRecipientName(caller)
+                setCallerId(from)
                 answerCall(from)
+               
+            })
+
+
+            socket.on('muteAudio',({from}) => {
+                if(remoteMuted)
+                {
+                    userVideo.current.muted = false
+                    setRemoteMuted(false)
+                }
+                else
+                {
+                    userVideo.current.muted = true
+                    setRemoteMuted(true)
+                }
+            })
+
+            socket.on('hideVideo',({from}) => {
+                if(!remoteVideoHidden)
+                {
+                    userVideo.current.autoplay = false
+                    userVideo.current.load()
+                    console.log('hiding remote video')
+                    setRemoteVideoHidden(true)
+                }
+                else
+                {
+                    userVideo.current.autoplay = true
+                    userVideo.current.load()
+                    console.log('unhiding remote video')
+
+                    setRemoteVideoHidden(false)
+                }
             })
         }
-    },[moPeer,socketId])
+    },[moPeer,socketId,username,remoteMuted,remoteVideoHidden])
 
 
 
@@ -86,7 +131,7 @@ const ContextProvider = ({children}) => {
         // const moPeer = new Peer(socketId)
         console.log(moPeer)
         console.log(from)
-        socket.emit('answercall',{to:from,from:socketId})
+        socket.emit('answercall',{to:from,from:socketId,recipientName:username})
 
         moPeer.on("call", (call) => {
             call.answer(stream)
@@ -101,7 +146,7 @@ const ContextProvider = ({children}) => {
     }
     const callUser = (id) => {
         // const peer = new Peer(socketId);
-        
+        setRecId(id)
         const call = moPeer.call(id, stream);
         console.log("calling: "+id)
         console.log(call)
@@ -119,7 +164,7 @@ const ContextProvider = ({children}) => {
 		});
 
 
-        socket.emit('calluser',{from:socketId,userToCall:id})
+        socket.emit('calluser',{from:socketId,userToCall:id,callerName:username})
     }
 
 
@@ -135,10 +180,68 @@ const ContextProvider = ({children}) => {
         window.location.reload()
     }
 
+    const leaveRes = () => {
+        setCallEnded(true)
+        if(moPeer)moPeer.destroy()
+        window.location.reload()
+        
+    }
+
+
+    const handleMuteAudio = () => {
+        if(recId)
+        {
+            socket.emit('muteAudio',recId)
+        }
+        else
+        {
+            socket.emit('muteAudio',socketId)
+            
+        }
+
+        if(muted)
+        {
+             myVideo.current.muted = false
+            setMuted(false)
+        }
+        else
+        {   
+            myVideo.current.muted = true
+            setMuted(true)
+        }
+
+    }
+
+    const handleHideVideo = () => {
+        if(recId)
+        {
+            socket.emit('hideVideo',recId)
+        }
+        else
+        {
+            socket.emit('hideVideo',socketId)
+            
+        }
+
+        if(!videoHidden)
+        {
+            myVideo.current.autoplay = false
+            myVideo.current.load()
+            setVideoHidden(true)
+        }
+        else
+        {   
+            myVideo.current.autoplay = true
+            myVideo.current.load()
+            setVideoHidden(false)
+        }
+    }
+
 
 
     return(
-        <SocketContext.Provider value={{callAccepted,myVideo,userVideo,callEnded,socketId,callUser,answerCall,leaveCall,stream,allUsers,setUsername,username,recipientName}}>
+        <SocketContext.Provider value={{callAccepted,myVideo,userVideo,callEnded,socketId,callUser,answerCall,leaveCall,stream,allUsers,setUsername,username,recipientName,recId,
+            handleMuteAudio,muted,remoteMuted,videoHidden,remoteVideoHidden,handleHideVideo,calls,setCall,callerId}}>
             {children}
         </SocketContext.Provider>
         )

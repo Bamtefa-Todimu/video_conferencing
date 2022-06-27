@@ -78,3 +78,32 @@
                            font-size: 0.7rem;
                         }
         }
+
+
+.call-notification-popup
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    width: 60%;
+    max-width: 300px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: green;
+    color: white;
+    z-index: 10;
+
+}
+
+.cn-action
+{
+    display: flex;
+}
+
+.cn-answer
+{
+    margin-right: 1rem;
+}
