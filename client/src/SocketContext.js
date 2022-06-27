@@ -2,7 +2,7 @@ import React , {useEffect,useState,useRef,useContext, createContext} from 'react
 import {io} from 'socket.io-client'
 import {Peer} from 'peerjs'
 
-const socket = io('http://localhost:5000')
+const socket = io('https://video-conferencing-backend.herokuapp.com/')
 
 const SocketContext = createContext()
 
